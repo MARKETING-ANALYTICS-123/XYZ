@@ -5,6 +5,7 @@ on:
     paths:
       - '**/*.sql'
     branches:
+      - main
       - prod
 
 jobs:
