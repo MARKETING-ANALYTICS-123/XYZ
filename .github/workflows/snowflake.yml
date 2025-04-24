@@ -5,7 +5,7 @@ on:
     paths:
       - '**/*.sql'
     branches:
-      - proD
+      - prod
 
 jobs:
   run-snowflake:
