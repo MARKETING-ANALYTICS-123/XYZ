@@ -31,35 +31,35 @@ jobs:
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
         run: |
           latest_sql_file=$(find . -name '*.sql' | sort | tail -n 1)
-
           echo "Executing SQL file: $latest_sql_file"
 
-          python3 - <<EOF
+          echo "
 import os
 import snowflake.connector
 
-print("Connecting to Snowflake...")
+print('Connecting to Snowflake...')
 conn = snowflake.connector.connect(
     user=os.environ['SNOWFLAKE_USER'],
     password=os.environ['SNOWFLAKE_PASSWORD'],
     account=os.environ['SNOWFLAKE_ACCOUNT']
 )
 
-print("Selecting context...")
-conn.cursor().execute(f"USE DATABASE {os.environ['SNOWFLAKE_DATABASE']}")
-conn.cursor().execute(f"USE SCHEMA {os.environ['SNOWFLAKE_SCHEMA']}")
-conn.cursor().execute(f"USE WAREHOUSE {os.environ['SNOWFLAKE_WAREHOUSE']}")
+print('Selecting context...')
+conn.cursor().execute(f\"USE DATABASE {os.environ['SNOWFLAKE_DATABASE']}\")
+conn.cursor().execute(f\"USE SCHEMA {os.environ['SNOWFLAKE_SCHEMA']}\")
+conn.cursor().execute(f\"USE WAREHOUSE {os.environ['SNOWFLAKE_WAREHOUSE']}\")
+print('Context selected.')
 
-sql_path = "${latest_sql_file}"
-print(f"Reading SQL from: {sql_path}")
-with open(sql_path, 'r') as f:
-    sql = f.read()
+with open('$latest_sql_file', 'r') as file:
+    sql_script = file.read()
 
-for stmt in sql.split(';'):
+for stmt in sql_script.split(';'):
     if stmt.strip():
-        print(f"Executing: {stmt}")
+        print(f'Executing statement: {stmt.strip()}')
         conn.cursor().execute(stmt)
 
 conn.close()
-print("✅ Done executing SQL.")
-EOF
+print('✅ SQL execution completed.')
+" > run_script.py
+
+          python3 run_script.py
